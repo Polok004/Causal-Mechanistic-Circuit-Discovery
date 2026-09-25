@@ -1,0 +1,21 @@
+# ESM-2 35M — opt-in, for final results. 12 layers, d_model=480, ~35M params.
+# Run with: python scripts/train_sae.py model=esm2_35m
+#
+# On an 8 GB M2 this trains fine but is roughly 4-5x slower end to end than the
+# 8M default, and the circuit sweep over 12 layers is the part that hurts. Use
+# the 8M model to iterate, switch to this for the numbers you report.
+name: esm2_t12_35M_UR50D
+hf_id: facebook/esm2_t12_35M_UR50D
+
+num_layers: 12
+hidden_size: 480
+num_attention_heads: 20
+intermediate_size: 1920
+vocab_size: 33
+max_position_embeddings: 1026
+
+target_layers: [4, 6, 8]
+primary_layer: 6
+
+max_seq_len: 1022
+extract_batch_size: 4

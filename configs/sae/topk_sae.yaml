@@ -1,0 +1,59 @@
+# Top-K sparse autoencoder.
+#
+# Top-K is used instead of an L1 penalty because it fixes L0 exactly (= k), which
+# removes the sparsity-coefficient sweep entirely and makes reconstruction
+# quality comparable across layers and across model sizes without retuning.
+
+arch:
+  # d_sae = hidden_size * dict_mult. At dict_mult=16 the 8M model gives a
+  # 5120-feature dictionary, the 35M model 7680.
+  dict_mult: 16
+  # Number of latents allowed to fire per token.
+  k: 32
+  # Auxiliary top-k over *dead* latents. This is what stops the dictionary from
+  # collapsing: dead latents are asked to reconstruct the residual error, which
+  # revives them. Set aux_k to 0 to disable.
+  aux_k: 256
+  aux_alpha: 0.03125          # 1/32, the coefficient from the OpenAI Top-K SAE recipe
+  # A latent is "dead" if it has not fired in this many training tokens.
+  dead_after_tokens: 1_000_000
+  # Subtract the decoder bias before encoding (pre-centering). Keep on.
+  center_input: true
+  # Tie b_dec initialisation to the mean of the first activation batch.
+  init_b_dec_from_data: true
+
+train:
+  # Number of protein sequences to draw activations from.
+  num_sequences: 10000
+  # Tokens per optimiser step.
+  batch_size: 4096
+  lr: 3.0e-4
+  # Linear warmup then cosine decay.
+  warmup_steps: 500
+  total_steps: 20000
+  # Adam betas; beta2=0.999 is fine, the Top-K objective is well behaved.
+  betas: [0.9, 0.999]
+  # Global grad-norm clip. Mostly matters early, before b_dec settles.
+  grad_clip: 1.0
+
+  # Streaming activation buffer. Activations are produced by forward passes and
+  # shuffled through this buffer rather than being materialised all at once —
+  # 10k sequences x ~300 tokens x 320 dims in fp32 is ~4 GB, which does not fit
+  # alongside the model on an 8 GB machine.
+  buffer_tokens: 262144         # ~320 MB at d=320 fp32
+  refill_at: 0.5                # refill when the buffer drops below this fraction
+
+  # Normalise activations to unit mean-norm before the SAE sees them. Keeps the
+  # learning rate transferable across layers, which otherwise have very
+  # different activation scales in ESM-2.
+  normalize_activations: true
+
+  log_every: 100
+  eval_every: 1000
+  checkpoint_every: 5000
+
+eval:
+  # Tokens held out for reconstruction / sparsity metrics.
+  num_eval_tokens: 65536
+  # Top-activating tokens kept per feature for the monosemanticity analysis.
+  top_tokens_per_feature: 32

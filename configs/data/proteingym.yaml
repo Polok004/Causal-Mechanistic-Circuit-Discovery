@@ -1,0 +1,51 @@
+# Variant-effect data source for circuit discovery.
+#
+# `source` selects the loader in src/utils/dataloaders.py:
+#   proteingym  - ProteinGym DMS substitution assays (CSV per assay)
+#   clinvar     - ClinVar pathogenic/benign missense pairs (TSV)
+#   synthetic   - generated in-process; no download, used by the test suite and
+#                 for smoke-testing the pipeline before assets are fetched
+source: proteingym
+
+proteingym:
+  # Directory of per-assay CSVs, as produced by scripts/fetch_assets.py.
+  dms_dir: ${paths.data}/ProteinGym/DMS_substitutions
+  # Restrict to these assays; null means "every CSV in dms_dir".
+  assays: null
+  # ProteinGym column names.
+  mutant_col: mutant           # e.g. "A45T" (1-indexed, wt-pos-mut)
+  score_col: DMS_score
+  binarised_col: DMS_score_bin # 1 = functional, 0 = deleterious
+  # Skip assays whose wild-type sequence exceeds this many residues.
+  max_wt_len: 500
+  # Cap on variants sampled per assay, to keep a sweep tractable.
+  max_variants_per_assay: 200
+
+clinvar:
+  table: ${paths.data}/clinvar/missense_pairs.tsv
+  seq_col: wt_sequence
+  mutant_col: mutant
+  label_col: clinical_significance
+  pathogenic_labels: ["Pathogenic", "Likely_pathogenic"]
+  benign_labels: ["Benign", "Likely_benign"]
+
+synthetic:
+  num_proteins: 64
+  min_len: 60
+  max_len: 180
+  variants_per_protein: 8
+  # Planted motif that the synthetic generator makes functionally important, so
+  # circuit discovery has a known ground truth to recover.
+  motif: "HExxH"
+  seed: 0
+
+# Sequences used to *train* the SAE (distinct from the variant-effect set above).
+sae_corpus:
+  # A FASTA of diverse sequences. fetch_assets.py writes a UniProt/SwissProt
+  # subset here; any FASTA works.
+  fasta: ${paths.data}/corpus/sequences.fasta
+  # If the FASTA is missing, fall back to synthetic sequences so the training
+  # script still runs end to end.
+  allow_synthetic_fallback: true
+  min_len: 40
+  max_len: 512

@@ -1,0 +1,42 @@
+# --- project data & artifacts -------------------------------------------------
+assets/pdb/
+assets/models/
+assets/data/
+outputs/
+multirun/
+*.pt
+*.safetensors
+*.npy
+*.npz
+!tests/fixtures/**
+
+# --- python -------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.coverage
+htmlcov/
+.ruff_cache/
+
+# --- environments -------------------------------------------------------------
+.venv/
+venv/
+env/
+.python-version
+
+# --- editors / os -------------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+
+# --- latex --------------------------------------------------------------------
+paper/*.aux
+paper/*.log
+paper/*.out
+paper/*.bbl
+paper/*.blg
+paper/*.synctex.gz

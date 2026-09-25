@@ -1,0 +1,49 @@
+% Preamble used when rendering docs/GUIDE.md to PDF with pandoc + xelatex.
+% Build:  make docs   (or see docs/README.md)
+
+% --- code blocks: wrap long lines instead of overflowing the margin ---------
+\usepackage{fvextra}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{
+  commandchars=\\\{\},
+  breaklines=true,
+  breakanywhere=true,
+  breaksymbolleft={},
+  breaksymbolright=\tiny\ensuremath{\hookrightarrow},
+  fontsize=\small
+}
+\fvset{breaklines=true, breakanywhere=true, fontsize=\small}
+
+% --- tables: allow wrapping in cells and keep them on the page -------------
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\setlength{\tabcolsep}{5pt}
+\renewcommand{\arraystretch}{1.15}
+
+% --- headings: clear hierarchy, generous space before parts ----------------
+\usepackage{titlesec}
+\titleformat{\section}{\Large\bfseries\sffamily}{\thesection}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\sffamily}{\thesubsection}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\sffamily}{\thesubsubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{2.2\baselineskip}{1\baselineskip}
+\titlespacing*{\subsection}{0pt}{1.6\baselineskip}{0.6\baselineskip}
+
+% Link colours are set through pandoc's own variables (-V colorlinks,
+% -V linkcolor, -V urlcolor), not with \hypersetup here: header-includes is
+% injected *before* pandoc loads hyperref, so \hypersetup is still undefined
+% at this point in the preamble.
+
+% --- headers and footers ---------------------------------------------------
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\sffamily\nouppercase{\leftmark}}
+\fancyhead[R]{\small\sffamily CausalMech-Bio}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\setlength{\headheight}{14pt}
+
+% --- widow and orphan control ---------------------------------------------
+\widowpenalty=10000
+\clubpenalty=10000
+\raggedbottom
