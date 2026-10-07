@@ -120,8 +120,8 @@ def evaluate_reconstruction(
             torch.nn.functional.cosine_similarity(x, out.recon, dim=-1).sum()
         )
         l0_sum += float((out.latents != 0).sum(dim=-1).float().sum())
-        sum_x += x.sum(dim=0).double().cpu()
-        sum_x2 += float(x.double().pow(2).sum())
+        sum_x += x.sum(dim=0).cpu().double()
+        sum_x2 += float(x.cpu().double().pow(2).sum())
         seen += x.shape[0]
 
     mean_x = sum_x / seen
