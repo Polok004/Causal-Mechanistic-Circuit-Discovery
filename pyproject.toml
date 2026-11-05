@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "causalmech-bio"
+version = "0.1.0"
+description = "Causal mechanistic circuit discovery in protein language models via Top-K sparse autoencoders and path patching."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Shoumik Barman Polok" }]
+keywords = [
+  "mechanistic-interpretability",
+  "sparse-autoencoder",
+  "protein-language-model",
+  "esm2",
+  "causal-inference",
+]
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+# `src` on the path means tests import the package exactly as the scripts do.
+pythonpath = ["src"]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+  "slow: marks tests that take more than a few seconds",
+  "needs_weights: requires pretrained ESM-2 weights downloaded via scripts/fetch_assets.py",
+  "needs_pdb: requires a PDB file downloaded via scripts/fetch_assets.py",
+]
+filterwarnings = [
+  "ignore::DeprecationWarning:Bio.*",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+ignore = ["E501", "B008"]

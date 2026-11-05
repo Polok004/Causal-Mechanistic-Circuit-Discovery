@@ -1,0 +1,28 @@
+# ESM-2 8M — the default. 6 layers, d_model=320, ~8M params.
+# Chosen as the default because SAE training and the full circuit sweep both fit
+# comfortably in ~8 GB of unified memory on an M2 MacBook Air.
+name: esm2_t6_8M_UR50D
+hf_id: facebook/esm2_t6_8M_UR50D
+
+# Filled in from the checkpoint at load time; listed here so configs are
+# self-documenting and so tests can build an architecture-identical stub.
+num_layers: 6
+hidden_size: 320
+num_attention_heads: 20
+intermediate_size: 1280
+vocab_size: 33
+max_position_embeddings: 1026
+
+# Residual-stream layers to hook. Middle layers carry the most structured
+# features in ESM-2; layer 0 is close to the embedding and the last layer is
+# specialised toward the LM head.
+target_layers: [2, 3, 4]
+
+# The layer whose SAE the circuit-discovery scripts use by default.
+primary_layer: 3
+
+# Truncate sequences longer than this (tokens, excluding <cls>/<eos>).
+max_seq_len: 1022
+
+# Batch size for activation extraction. Lower it if you hit memory pressure.
+extract_batch_size: 8

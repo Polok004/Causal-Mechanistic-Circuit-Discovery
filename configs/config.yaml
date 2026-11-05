@@ -1,0 +1,35 @@
+# CausalMech-Bio — root Hydra config.
+#
+# Override anything from the CLI, e.g.
+#   python scripts/train_sae.py model=esm2_35m sae.k=64 train.num_sequences=20000
+defaults:
+  - model: esm2_8m
+  - sae: topk_sae
+  - data: proteingym
+  - _self_
+
+seed: 0
+
+# `auto` resolves to mps on Apple Silicon, then cuda, then cpu.
+device: auto
+
+# Apple Silicon note: several ops still fall back to CPU under MPS. Leaving this
+# true sets PYTORCH_ENABLE_MPS_FALLBACK=1 so a missing kernel degrades instead of
+# raising. Set to false if you want unimplemented ops to fail loudly.
+mps_fallback: true
+
+paths:
+  root: ${hydra:runtime.cwd}
+  assets: ${paths.root}/assets
+  models: ${paths.assets}/models
+  pdb: ${paths.assets}/pdb
+  data: ${paths.assets}/data
+  outputs: ${paths.root}/outputs
+
+hydra:
+  run:
+    dir: ${paths.outputs}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ${paths.outputs}/multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  job:
+    chdir: false
